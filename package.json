@@ -1,0 +1,34 @@
+{
+  "name": "busb",
+  "version": "0.0.1",
+  "description": "webusb and node-usb vendor. API for web and node.",
+  "keywords": [
+    "usb",
+    "webusb",
+    "libusb"
+  ],
+  "license": "MIT",
+  "repository": "git://github.com/nodar-chkuaselidze/busb.git",
+  "homepage": "https://github.com/nodar-chkuaselidze/busb#readme",
+  "bugs": {
+    "url": "https://github.com/nodar-chkuaselidze/busb/issues"
+  },
+  "author": "Nodari Chkuaselidze <nodar.chkuaselidze@gmail.com>",
+  "main": "lib/busb.js",
+  "scripts": {
+    "install": "node-gyp rebuild",
+    "lint": "eslint lib/ test/ || exit 0",
+    "test": "bmocha --reporter spec test/*-test.js"
+  },
+  "browser": {
+    "./lib/busb": "./lib/busb-browser.js"
+  },
+  "dependencies": {
+    "loady": "~0.0.1",
+    "nan": "^2.13.2"
+  },
+  "devDependencies": {
+    "bmocha": "^2.1.2"
+  },
+  "gypfile": true
+}
