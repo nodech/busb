@@ -157,7 +157,8 @@ class USBAdapter extends events_1.EventEmitter {
                 }
                 return this.delay(timeout)
                     .then(() => this.retryPromise(fn, --retries, timeout))
-                    .then(resolve);
+                    .then(resolve)
+                    .catch(retryError => reject(retryError));
             });
         });
     }

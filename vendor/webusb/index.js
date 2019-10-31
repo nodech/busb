@@ -30,7 +30,12 @@ exports.USB = usb_1.USB;
  * Default usb instance synonymous with `navigator.usb`
  */
 exports.usb = new usb_1.USB();
-
+/**
+ * Adapter
+ */
+var adapter_1 = require("./adapter");
+exports.adapter = adapter_1.adapter;
+exports.USBAdapter = adapter_1.USBAdapter;
 /**
  * Other classes if required
  */

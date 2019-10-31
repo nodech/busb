@@ -167,7 +167,10 @@ class USBDevice {
                 return reject(new Error("close error: device not found"));
             if (!this.opened)
                 return resolve();
-            adapter_1.adapter.close(this._handle)
+            const releaseInterfacePromises = this.configuration.interfaces.map(iface => this.releaseInterface(iface.interfaceNumber));
+            Promise.all(releaseInterfacePromises)
+                .catch(_error => { })
+                .then(() => adapter_1.adapter.close(this._handle))
                 .then(resolve)
                 .catch(error => {
                 reject(new Error(`close error: ${error}`));
