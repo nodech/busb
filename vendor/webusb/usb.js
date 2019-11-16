@@ -25,7 +25,9 @@
 */
 Object.defineProperty(exports, "__esModule", { value: true });
 const dispatcher_1 = require("./dispatcher");
+const device_1 = require("./device");
 const adapter_1 = require("./adapter");
+const helpers_1 = require("./helpers");
 /**
  * USB class
  */
@@ -36,55 +38,34 @@ class USB extends dispatcher_1.EventDispatcher {
      */
     constructor(options) {
         super();
-        this.allowedDevices = [];
+        this.allowedDevices = new Set();
+        this.connectedDevices = new Map();
+        this.deviceByHandle = new Map();
         options = options || {};
         this.devicesFound = options.devicesFound;
-        const deviceConnectCallback = device => {
+        adapter_1.adapter.addListener(adapter_1.USBAdapter.EVENT_DEVICE_CONNECT, device => {
             if (this.replaceAllowedDevice(device)) {
                 this.emit(USB.EVENT_DEVICE_CONNECT, device);
             }
-        };
-        const deviceDisconnectCallback = handle => {
-            const allowedDevice = this.allowedDevices.find(allowedDevices => allowedDevices._handle === handle);
-            if (allowedDevice) {
-                this.emit(USB.EVENT_DEVICE_DISCONNECT, allowedDevice);
-            }
-        };
-        this.on("newListener", event => {
-            const listenerCount = this.listenerCount(event);
-            if (listenerCount !== 0) {
-                return;
-            }
-            if (event === USB.EVENT_DEVICE_CONNECT) {
-                adapter_1.adapter.addListener(adapter_1.USBAdapter.EVENT_DEVICE_CONNECT, deviceConnectCallback);
-            }
-            else if (event === USB.EVENT_DEVICE_DISCONNECT) {
-                adapter_1.adapter.addListener(adapter_1.USBAdapter.EVENT_DEVICE_DISCONNECT, deviceDisconnectCallback);
-            }
         });
-        this.on("removeListener", event => {
-            const listenerCount = this.listenerCount(event);
-            if (listenerCount !== 0) {
-                return;
-            }
-            if (event === USB.EVENT_DEVICE_CONNECT) {
-                adapter_1.adapter.removeListener(adapter_1.USBAdapter.EVENT_DEVICE_CONNECT, deviceConnectCallback);
-            }
-            else if (event === USB.EVENT_DEVICE_DISCONNECT) {
-                adapter_1.adapter.removeListener(adapter_1.USBAdapter.EVENT_DEVICE_DISCONNECT, deviceDisconnectCallback);
+        adapter_1.adapter.addListener(adapter_1.USBAdapter.EVENT_DEVICE_DISCONNECT, handle => {
+            const device = this.deviceByHandle.get(handle);
+            if (device) {
+                const key = helpers_1.deviceToKey(device);
+                this.emit(USB.EVENT_DEVICE_DISCONNECT, device);
+                this.connectedDevices.delete(key);
+                this.deviceByHandle.delete(handle);
             }
         });
     }
     replaceAllowedDevice(device) {
-        for (const i in this.allowedDevices) {
-            if (this.allowedDevices[i].productId === device.productId
-                && this.allowedDevices[i].vendorId === device.vendorId
-                && this.allowedDevices[i].serialNumber === device.serialNumber) {
-                this.allowedDevices[i] = device;
-                return true;
-            }
+        const key = helpers_1.deviceToKey(device);
+        if (!this.allowedDevices.has(key)) {
+            return false;
         }
-        return false;
+        this.connectedDevices.set(key, device);
+        this.deviceByHandle.set(device._handle, device);
+        return true;
     }
     filterDevice(options, device) {
         return options.filters.some(filter => {
@@ -133,7 +114,7 @@ class USB extends dispatcher_1.EventDispatcher {
      */
     getDevices() {
         return new Promise((resolve, _reject) => {
-            resolve(this.allowedDevices);
+            resolve(Array.from(this.connectedDevices.values()));
         });
     }
     /**
@@ -182,16 +163,26 @@ class USB extends dispatcher_1.EventDispatcher {
                     return reject(new Error("requestDevice error: no devices found"));
                 }
                 function selectFn(device) {
-                    if (!this.replaceAllowedDevice(device))
-                        this.allowedDevices.push(device);
+                    if (!(device instanceof device_1.USBDevice)) {
+                        return reject(new Error("requestDevice error: invalid device type."));
+                    }
+                    if (!this.replaceAllowedDevice(device)) {
+                        const key = helpers_1.deviceToKey(device);
+                        this.allowedDevices.add(key);
+                        this.connectedDevices.set(key, device);
+                        this.deviceByHandle.set(device._handle, device);
+                    }
                     resolve(device);
                 }
                 // If no devicesFound function, select the first device found
                 if (!this.devicesFound)
                     return selectFn.call(this, devices[0]);
-                const selectedDevice = this.devicesFound(devices, selectFn.bind(this));
-                if (selectedDevice)
-                    selectFn.call(this, selectedDevice);
+                return this.devicesFound(devices)
+                    .then(device => {
+                    if (device) {
+                        return selectFn.call(this, device);
+                    }
+                });
             }).catch(error => {
                 reject(new Error(`requestDevice error: ${error}`));
             });
