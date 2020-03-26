@@ -24,11 +24,11 @@
     "./lib/busb": "./lib/busb-browser.js"
   },
   "dependencies": {
-    "loady": "~0.0.1",
-    "nan": "^2.13.2"
+    "loady": "git+https://github.com/chjj/loady#semver:~0.0.1",
+    "nan": "git+https://github.com/braydonf/nan.git#semver:^2.14.0"
   },
   "devDependencies": {
-    "bmocha": "^2.1.2"
+    "bmocha": "git+https://github.com/bcoin-org/bmocha.git#semver:^2.1.2"
   },
   "gypfile": true
 }
