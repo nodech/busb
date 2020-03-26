@@ -3,6 +3,16 @@ BUSB
 
 A package that vendors [node-usb][node-usb] and [webusb][webusb] projects.
 
+Installation
+============
+
+### Debian/Ubuntu
+
+Add the necessary dependencies:
+```sh
+apt-get install libusb-dev libudev-dev
+```
+
 License
 =======
 
