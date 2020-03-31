@@ -1,6 +1,6 @@
 {
   "name": "busb",
-  "version": "0.1.1",
+  "version": "1.0.0-beta.0",
   "description": "webusb and node-usb vendor. API for web and node.",
   "keywords": [
     "usb",

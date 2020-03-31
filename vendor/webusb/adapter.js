@@ -163,6 +163,8 @@ class USBAdapter extends events_1.EventEmitter {
         });
     }
     loadDevices() {
+        // Reset device cache
+        this.devices = {};
         const devices = usb_1.getDeviceList();
         return this.serialPromises(this.loadDevice, devices);
     }

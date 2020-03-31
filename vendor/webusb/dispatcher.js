@@ -1,7 +1,7 @@
 "use strict";
 /*
 * Node WebUSB
-* Copyright (c) 2017 Rob Moran
+* Copyright (c) 2019 Rob Moran
 *
 * The MIT License (MIT)
 *
@@ -29,20 +29,24 @@ const events_1 = require("events");
  * @hidden
  */
 class EventDispatcher extends events_1.EventEmitter {
-    // tslint:disable-next-line:array-type
-    addEventListener(event, listener) {
-        return super.addListener(event, listener);
+    constructor() {
+        super(...arguments);
+        this.isEventListenerObject = (listener) => listener.handleEvent !== undefined;
     }
-    // tslint:disable-next-line:array-type
-    removeEventListener(event, listener) {
-        return super.removeListener(event, listener);
+    addEventListener(type, listener) {
+        if (listener) {
+            const handler = this.isEventListenerObject(listener) ? listener.handleEvent : listener;
+            super.addListener(type, handler);
+        }
     }
-    dispatchEvent(event, value) {
-        return super.emit(event, {
-            type: event,
-            target: this,
-            value: value
-        });
+    removeEventListener(type, callback) {
+        if (callback) {
+            const handler = this.isEventListenerObject(callback) ? callback.handleEvent : callback;
+            super.removeListener(type, handler);
+        }
+    }
+    dispatchEvent(event) {
+        return super.emit(event.type, event);
     }
 }
 exports.EventDispatcher = EventDispatcher;

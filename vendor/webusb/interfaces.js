@@ -1,7 +1,7 @@
 "use strict";
 /*
 * Node WebUSB
-* Copyright (c) 2017 Rob Moran
+* Copyright (c) 2019 Rob Moran
 *
 * The MIT License (MIT)
 *
