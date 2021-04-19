@@ -1,6 +1,6 @@
 {
   "name": "busb",
-  "version": "1.0.0-beta.0",
+  "version": "1.0.0-beta.1",
   "description": "webusb and node-usb vendor. API for web and node.",
   "keywords": [
     "usb",
@@ -8,10 +8,10 @@
     "libusb"
   ],
   "license": "MIT",
-  "repository": "git://github.com/nodar-chkuaselidze/busb.git",
-  "homepage": "https://github.com/nodar-chkuaselidze/busb#readme",
+  "repository": "git://github.com/nodech/busb.git",
+  "homepage": "https://github.com/nodech/busb#readme",
   "bugs": {
-    "url": "https://github.com/nodar-chkuaselidze/busb/issues"
+    "url": "https://github.com/nodech/busb/issues"
   },
   "author": "Nodari Chkuaselidze <nodar.chkuaselidze@gmail.com>",
   "main": "lib/busb.js",
