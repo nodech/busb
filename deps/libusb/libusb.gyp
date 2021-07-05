@@ -124,7 +124,12 @@
         "include_dirs": [
           "libusb-<(lusbversion)/msvc"
         ],
-        "msvs_disabled_warnings": [ 4267 ]
+        "msvs_disabled_warnings": [ 4267 ],
+        "msvs_settings": {
+          "VCCLCompilerTool": {
+            "AdditionalOptions": [ "/source-charset:utf-8" ],
+          },
+        }
       }]
     ]
   }]
